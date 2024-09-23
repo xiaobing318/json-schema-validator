@@ -2,86 +2,85 @@
 
 # JSON schema validator for JSON for Modern C++
 
-# What is it?
+# What is it?（JSON schema validator是什么？）
 
 This is a C++ library for validating JSON documents based on a
 [JSON Schema](http://json-schema.org/) which itself should validate with
-[draft-7 of JSON Schema Validation](http://json-schema.org/schema).
+[draft-7 of JSON Schema Validation](http://json-schema.org/schema).（这是一个基于
+[JSON Schema](http://json-schema.org/) 验证 JSON 文档的 C++ 库，该库本身应使用
+[JSON Schema 验证草案 7](http://json-schema.org/schema) 进行验证。）
 
 First a disclaimer: *It is work in progress and
-contributions or hints or discussions are welcome.*
+contributions or hints or discussions are welcome.*（首先声明：*这项工作仍在进行中，欢迎贡献、提示或讨论。*）
 
 Niels Lohmann et al develop a great JSON parser for C++ called [JSON for Modern
 C++](https://github.com/nlohmann/json). This validator is based on this
-library, hence the name.
+library, hence the name.（Niels Lohmann 等人开发了一款出色的 C++ JSON 解析器，名为 [JSON for Modern
+C++](https://github.com/nlohmann/json)。此验证器基于此
+库，因此得名。）
 
 External documentation is missing as well. However the API of the validator
-is rather simple.
+is rather simple.（外部文档也缺失。不过验证器的 API 相当简单。）
 
 # New in version 2
 
 Although significant changes have been done for the 2nd version
 (a complete rewrite) the API is compatible with the 1.0.0 release. Except for
-the namespace which is now `nlohmann::json_schema`.
+the namespace which is now `nlohmann::json_schema`.（尽管第二版进行了重大更改（完全重写），但 API 与 1.0.0 版本兼容。除了命名空间现在为“nlohmann::json_schema”。）
 
 Version **2** supports JSON schema draft 7, whereas 1 was supporting draft 4
-only. Please update your schemas.
+only. Please update your schemas.（版本 **2** 支持 JSON 架构草案 7，而版本 1 仅支持草案 4。请更新您的架构。）
+
 
 The primary change in 2 is the way a schema is used. While in version 1 the schema was
 kept as a JSON-document and used again and again during validation, in version 2 the schema
 is parsed into compiled C++ objects which are then used during validation. There are surely
 still optimizations to be done, but validation speed has improved by factor 100
-or more.
+or more.（版本 2 的主要变化在于模式的使用方式。在版本 1 中，模式被保存为 JSON 文档并在验证过程中反复使用，而在版本 2 中，模式被解析为编译后的 C++ 对象，然后在验证过程中使用。当然，仍有优化需要完成，但验证速度已提高了 100 倍或更多。）
 
-# Design goals
+# Design goals（设计目标）
 
 The main goal of this validator is to produce *human-comprehensible* error
-messages if a JSON-document/instance does not comply to its schema.
+messages if a JSON-document/instance does not comply to its schema.（此验证器的主要目标是，如果 JSON 文档/实例不符合其架构，则生成*人类可理解的*错误
+消息。）
 
 By default this is done with exceptions thrown at the users with a helpful
-message telling what's wrong with the document while validating.
+message telling what's wrong with the document while validating.（默认情况下，这是通过向用户抛出异常来完成的，并显示一条有用的消息，告知验证过程中文档出了什么问题。）
 
 Starting with **2.0.0** the user can pass a `json_schema::basic_error_handler`-derived
 object along with the instance to validate to receive a callback each time
-a validation error occurs and decide what to do (throwing, counting, collecting).
+a validation error occurs and decide what to do (throwing, counting, collecting).（从 **2.0.0** 开始，用户可以传递一个 `json_schema::basic_error_handler` 派生的对象以及要验证的实例，以便在每次发生验证错误时接收回调并决定要做什么（抛出、计数、收集）。）
 
 Another goal was to use Niels Lohmann's JSON-library. This is why the validator
-lives in his namespace.
+lives in his namespace.（另一个目标是使用 Niels Lohmann 的 JSON 库。这就是验证器存在于其命名空间中的原因。）
 
-# Thread-safety
+# Thread-safety（线程安全）
 
-Instance validation is thread-safe and the same validator-object can be used by
-different threads:
+Instance validation is thread-safe and the same validator-object can be used by different threads（实例验证是线程安全的，并且不同的线程可以使用相同的验证器对象）:
 
-The validate method is `const` which indicates the object is not modified when
-being called:
+The validate method is `const` which indicates the object is not modified when being called（validate 方法是 const ，表示调用时对象不会被修改）:
 
 ```C++
 	json json_validator::validate(const json &) const;
 ```
 
-Validator-object creation however is not thread-safe. A validator has to be
-created in one (main?) thread once.
+Validator-object creation however is not thread-safe. A validator has to be created in one (main?) thread once.（但是验证器对象的创建不是线程安全的。验证器必须在一个（主？）线程中创建一次。）
 
-# Weaknesses
+# Weaknesses（缺点）
 
-Numerical validation uses nlohmann-json's integer, unsigned and floating point
-types, depending on if the schema type is "integer" or "number". Bignum
-(i.e. arbitrary precision and range) is not supported at this time.
+Numerical validation uses nlohmann-json's integer, unsigned and floating point types, depending on if the schema type is "integer" or "number". Bignum (i.e. arbitrary precision and range) is not supported at this time.（数字验证使用 nlohmann-json 的整数、无符号和浮点类型，具体取决于架构类型是“整数”还是“数字”。目前不支持 Bignum（即任意精度和范围）。）
 
-# Building
+# Building（构建）
 
-This library is based on Niels Lohmann's JSON-library and thus has
-a build-dependency to it.
+This library is based on Niels Lohmann's JSON-library and thus has a build-dependency to it.（该库基于 Niels Lohmann 的 JSON 库，因此具有构建依赖性。）
 
-Currently at least version **3.8.0** of NLohmann's JSON library
-is required.
+Currently at least version **3.8.0** of NLohmann's JSON library is required.（目前至少需要 NLohmann 的 JSON 库的 **3.8.0** 版本。）
 
-Various methods using CMake can be used to build this project.
+Various methods using CMake can be used to build this project.（可以使用多种使用 CMake 的方法来构建该项目。）
 
 ## Build out-of-source
 
-Do not run cmake inside the source-dir. Rather create a dedicated build-dir:
+Do not run cmake inside the source-dir. Rather create a dedicated build-dir（不要在源目录中运行 cmake。而是创建一个专用的构建目录）:
 
 ```Bash
 git clone https://github.com/pboettch/json-schema-validator.git
@@ -94,10 +93,9 @@ make install # if needed
 ctest # run unit, non-regression and test-suite tests
 ```
 
-## Building as shared library
+## Building as shared library（构建成一个共享库）
 
-By default a static library is built. Shared libraries can be generated by using
-the `BUILD_SHARED_LIBS`-cmake variable:
+By default a static library is built. Shared libraries can be generated by using the `BUILD_SHARED_LIBS`-cmake variable（默认情况下会构建静态库。可以使用 `BUILD_SHARED_LIBS`-cmake 变量生成共享库）:
 
 In your initial call to cmake simply add:
 
@@ -107,10 +105,10 @@ cmake [..] -DBUILD_SHARED_LIBS=ON [..]
 
 ## nlohmann-json integration
 
-As nlohmann-json is a dependency, this library tries find it.
+As nlohmann-json is a dependency, this library tries find it.（由于 nlohmann-json 是一个依赖项，因此该库会尝试找到它。）
 
 The cmake-configuration first checks if nlohmann-json is available as a cmake-target. This may be the case, because it is used as a submodule in a super-project which already provides and uses nlohmann-json.
-Otherwise, it calls `find_package` for nlohmann-json and requires nlohmann-json to be installed on the system.
+Otherwise, it calls `find_package` for nlohmann-json and requires nlohmann-json to be installed on the system.（cmake-configuration 首先检查 nlohmann-json 是否可用作 cmake-target。可能是这样，因为它被用作超级项目中的子模块，而超级项目已经提供并使用了 nlohmann-json。否则，它会调用 nlohmann-json 的 `find_package`，并要求在系统上安装 nlohmann-json。）
 
 ### Building with Hunter package manager
 
